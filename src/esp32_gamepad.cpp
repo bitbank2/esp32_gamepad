@@ -65,7 +65,7 @@ int i;
       for (i=0; i<4; i++)
       {
         if (pData[3+i] != 0xfe) // button is pressed
-           gamepad.u16Buttons |= (1<<i);
+           gamepad.u16Buttons |= (1<<pData[3+i]);
       }
       break;
     case 0x1c: // d-pad and new buttons
