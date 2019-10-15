@@ -22,7 +22,7 @@ Features:<br>
 - Designed to be used in the Arduino IDE<br> 
 <br>
 See the example sketch for how to use the library.
-<br>
+<br><br>
 
 If you find this code useful, please consider buying me a cup of coffee
 
