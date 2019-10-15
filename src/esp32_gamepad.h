@@ -44,6 +44,10 @@ bool SS_Scan(int iTime, uint8_t *bdAddr);
 // Connect to the given bluetooth address
 // returns TRUE for success, FALSE for failure
 bool SS_Connect(uint8_t *addr);
+//
+// Disconnect the gamepad
+//
+void SS_Disconnect(void);
 
 #endif // __ESP32_GAMEPAD__
 

@@ -29,9 +29,10 @@ static uint8_t bFound, address[6];
 
 SS_CALLBACK *pCallback = NULL; // user callback function for controller changes
 
-esp_err_t connHan;
-SS_GAMEPAD gamepad; // local copy of controls
-uint8_t bZeemote; // Zeemote or SteelSeries:Free
+static esp_err_t connHan;
+static SS_GAMEPAD gamepad; // local copy of controls
+static uint8_t bZeemote; // Zeemote or SteelSeries:Free
+static uint32_t handle; // connection handle;
 
 typedef struct _bd_data {
              esp_spp_status_t    status;         /*!< status */
@@ -51,6 +52,15 @@ void SS_RegisterCallback(SS_CALLBACK *myCallback)
 {
   pCallback = myCallback;
 } /* SS_RegisterCallback() */
+
+//
+// Disconnect the gamepad
+//
+void SS_Disconnect(void)
+{
+  if (handle != -1)
+    esp_spp_disconnect(handle);
+} /* SS_Disconnect() */
 
 // Get the latest button and analog stick state
 // from the HID-style packet received
@@ -99,12 +109,14 @@ static void spp_callback(esp_spp_cb_event_t event, esp_spp_cb_param_t *param)
   {
     // the only one we care about
     bd_data *bd = (bd_data *)param;
+    handle = bd->handle;
     ProcessZeemotePacket(bd->len, bd->data);
     if (pCallback)
       (*pCallback)(EVENT_CONTROLCHANGE, &gamepad);
   }
   else if (event == ESP_SPP_CLOSE_EVT) // disconnected
   {
+    handle = -1;
     if (pCallback)
       (*pCallback)(EVENT_DISCONNECT, &gamepad);
   }
@@ -148,6 +160,7 @@ int i, iCount;
 // Initialize the library
 void SS_Init(void)
 {
+  handle = -1;
   SerialBT.begin("ESP32", true); // Apparently this needs to be called first to initialize bluetooth (doesn't matter master or slave)
   esp_bt_gap_register_callback(gap_callback);
   esp_bt_gap_set_scan_mode(ESP_BT_SCAN_MODE_CONNECTABLE_DISCOVERABLE);
